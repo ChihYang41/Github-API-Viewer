@@ -1,26 +1,20 @@
+// 變數
 let page = 1;
-let userName = "ChihYang41";
+const dq = selector => {
+  return document.querySelector(selector);
+};
 
-async function getRepoData() {
-  // let data = await fetch('https://api.github.com/users/ChihYang41/repos?page=1&per_page=5').then(res => res.json())
-  // console.log(data)
+// 取得 Github Repo Data 並 render
+async function getRepoData(page) {
+  let data = await fetch(
+    `https://api.github.com/users/ChihYang41/repos?page=${page}&per_page=5`
+  ).then(res => res.json());
+  renderResults(data);
 }
 
-const data = [
-  {
-    name: "ChihYang41.github.io",
-    description: "Hexo Blog",
-    html_url: "https://github.com/ChihYang41/ChihYang41.github.io",
-  },
-  {
-    name: "chinese-copywriting-guidelines",
-    description: "Chinese copywriting guidelines for better written communication／中文文案排版指北",
-    html_url: "https://github.com/ChihYang41/chinese-copywriting-guidelines",
-  }
-]
-
+// render function
 function renderResults(data) {
-  for(let i = 0; i < 5; i++) {
+  for (let i = 0; i < data.length; i++) {
     $(".repo-results_row").append(`
     <div class="col">
       <div
@@ -43,7 +37,13 @@ function renderResults(data) {
 }
 
 // infinite scroll
+document.addEventListener("scroll", () => {
+  const lastOffset =
+    dq(".col:last-child").offsetTop + dq(".col:last-child").clientHeight;
+  if (window.pageYOffset + window.innerHeight > lastOffset - 10) {
+    page += 1;
+    getRepoData(page);
+  }
+});
 
 getRepoData();
-
-renderResults(data);
